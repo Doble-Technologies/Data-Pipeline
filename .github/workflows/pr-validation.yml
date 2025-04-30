@@ -1,0 +1,19 @@
+name: PR Validation
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  contents: read
+
+jobs:
+  pr-validation:
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ['self-hosted', 'pi']
+    steps:
+      - uses: TimonVS/pr-labeler-action@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/configs/pr-labeler-configuration.yml
