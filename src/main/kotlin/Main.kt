@@ -23,7 +23,7 @@ fun main() {
             maxFrameSize = Long.MAX_VALUE
             masking = false
         }
-        routing {
+        routing { 
             // Thread-safe set for all connected sessions
             val sessions = Collections.synchronizedSet(mutableSetOf<DefaultWebSocketServerSession>())
 
