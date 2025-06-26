@@ -1,13 +1,11 @@
 package tech.parkhurst.services
 
-import com.google.gson.GsonBuilder
 import com.google.maps.GeoApiContext
 import com.google.maps.GeocodingApi
 import com.google.maps.model.AddressComponent
 import com.google.maps.model.AddressComponentType
 import com.google.maps.model.GeocodingResult
 import com.google.maps.model.LatLng
-import com.mitteloupe.randomgenkt.builder.RandomGenBuilder
 import io.github.serpro69.kfaker.Faker
 import tech.parkhurst.modal.*
 import tech.parkhurst.modal.Unit
@@ -15,7 +13,6 @@ import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.random.Random
-
 
 class GeneratorLogic {
 
@@ -26,8 +23,6 @@ class GeneratorLogic {
     private var natures: ArrayList<String>  = ArrayList<String>()
     private var incDescriptions: ArrayList<String> = ArrayList<String>()
     private var weather: ArrayList<String> = ArrayList<String>()
-
-
 
     init {
         // Add more states if needed (min_lat, min_lon, max_lat, max_lon)
