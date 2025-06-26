@@ -61,11 +61,15 @@ dependencies {
     // Optional: Netty
     implementation("io.netty:netty-all:4.2.0.Final")
 
-
-
     //Tem
     implementation("com.mitteloupe.randomgenkt:randomgenkt:2.0.1")
     implementation("com.mitteloupe.randomgenkt:randomgenkt.datasource:2.0.1")
+
+    implementation("com.google.maps:google-maps-services:2.2.0")
+    implementation("org.slf4j:slf4j-simple:1.7.25")
+
+//    implementation("org.slf4j:slf4j-api:2.1.0-alpha1")
+
 }
 
 tasks.test {
