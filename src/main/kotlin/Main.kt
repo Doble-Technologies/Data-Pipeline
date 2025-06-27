@@ -14,13 +14,14 @@ import java.util.Collections
 import kotlin.time.Duration.Companion.seconds
 import java.io.File
 import org.slf4j.LoggerFactory
+import tech.parkhurst.config.connectToDatabase
+import tech.parkhurst.routes.ingestRoutes
 import java.security.KeyStore
 
 
 //Todo finish streamingRoutes, and ingest routes(CRUD API)
 // Setup connect to pocketbase auth db & postgress dbs
 private fun ApplicationEngine.Configuration.envConfig() {
-
     val keyAlias: String = System.getenv("keyAlias") ?: ""
     val jksPass: String = System.getenv("jksPass") ?: ""
 
@@ -42,7 +43,6 @@ private fun ApplicationEngine.Configuration.envConfig() {
 
 }
 fun main() {
-    println("TEST")
     embeddedServer(Netty, applicationEnvironment { log = LoggerFactory.getLogger("ktor.application") }, {envConfig()}) {
         install(WebSockets) {
             pingPeriod = 30.seconds
@@ -53,6 +53,7 @@ fun main() {
         install(Sessions){
             header<UserSession>("user_session")
         }
+        connectToDatabase()
         routing {
             // Thread-safe set for all connected sessions
             val sessions = Collections.synchronizedSet(mutableSetOf<DefaultWebSocketServerSession>())
@@ -71,6 +72,7 @@ fun main() {
                 }
             }
             streamingRoutes(sessions)
+            ingestRoutes()
         }
 
     }.start(wait = true)
