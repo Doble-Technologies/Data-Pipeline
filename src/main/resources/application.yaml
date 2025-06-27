@@ -1,9 +1,0 @@
-ktor:
-  deployment:
-    sslPort: 8443
-  security:
-    ssl:
-      keyStore: keystore.jks
-      keyAlias: rcslab
-      keyStorePassword: Panda1234
-      privateKeyPassword: Panda1234
