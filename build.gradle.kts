@@ -1,21 +1,12 @@
 plugins {
     kotlin("jvm") version "2.1.0"
     kotlin("plugin.serialization") version "2.1.0"
-//    id("dev.adamko.kx12q.kotlin-randomizer") version "0.4.0"
-    id("com.x12q.kotlin.randomizer") version "1.0.0-alpha.16-2.1.0"
-    // for other kotlin version:
-
-
-
     application
 }
 
 group = "tech.parkhurst"
 version = "0.0.1"
 
-kotlinRandomizer{
-    enable = true
-}
 repositories {
     mavenCentral()
 }
@@ -47,12 +38,6 @@ dependencies {
     // Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
 
-    // Kotlin Randomizer
-    implementation("com.x12q:kotlin-randomizer-lib:1.0.0-alpha.16-2.1.0")
-    //Kotlin Random
-    implementation("io.github.serpro69:kotlin-faker:2.0.0-rc.10")
-    implementation("io.github.serpro69:kotlin-faker-sports:2.0.0-rc.10")
-
 
     // JUnit 5
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
@@ -61,14 +46,19 @@ dependencies {
     // Optional: Netty
     implementation("io.netty:netty-all:4.2.0.Final")
 
-    //Tem
-    implementation("com.mitteloupe.randomgenkt:randomgenkt:2.0.1")
-    implementation("com.mitteloupe.randomgenkt:randomgenkt.datasource:2.0.1")
+    //Kotlin Random
+    implementation("io.github.serpro69:kotlin-faker:2.0.0-rc.10")
 
     implementation("com.google.maps:google-maps-services:2.2.0")
     implementation("org.slf4j:slf4j-simple:1.7.25")
 
-//    implementation("org.slf4j:slf4j-api:2.1.0-alpha1")
+
+    implementation("org.jetbrains.exposed:exposed-core:0.50.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.50.1")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.50.1")
+    implementation("org.postgresql:postgresql:42.7.2")
+    //Connection Pooling
+    implementation("com.zaxxer:HikariCP:5.1.0")
 
 }
 

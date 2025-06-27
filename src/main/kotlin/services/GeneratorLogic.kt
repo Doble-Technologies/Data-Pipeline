@@ -23,6 +23,8 @@ class GeneratorLogic {
     private var natures: ArrayList<String>  = ArrayList<String>()
     private var incDescriptions: ArrayList<String> = ArrayList<String>()
     private var weather: ArrayList<String> = ArrayList<String>()
+    private var apiKey: String = System.getenv("googleApiKey") ?: ""
+
 
     init {
         // Add more states if needed (min_lat, min_lon, max_lat, max_lon)
@@ -148,7 +150,7 @@ class GeneratorLogic {
         val cords=generateRandomCoordinates("CONNECTICUT")
         val latLngCords = LatLng(cords[0],cords[1])
         val geoContext = GeoApiContext.Builder()
-            .apiKey("x")
+            .apiKey(apiKey)
             .build()
         val req = GeocodingApi.newRequest(geoContext).latlng(latLngCords)
         var addressData: GeocodingResult? =null

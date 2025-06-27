@@ -7,6 +7,7 @@ import io.ktor.server.sessions.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.*
+import org.jetbrains.exposed.sql.Database
 import tech.parkhurst.config.UserSession
 import tech.parkhurst.routes.streamingRoutes
 import java.util.Collections
@@ -20,8 +21,11 @@ import java.security.KeyStore
 // Setup connect to pocketbase auth db & postgress dbs
 private fun ApplicationEngine.Configuration.envConfig() {
 
+    val keyAlias: String = System.getenv("keyAlias") ?: ""
+    val jksPass: String = System.getenv("jksPass") ?: ""
+
     val keyStore = KeyStore.getInstance("JKS").apply {
-        File("src/main/resources/certs/keystore.jks").inputStream().use { load(it, "X".toCharArray()) }
+        File("src/main/resources/certs/keystore.jks").inputStream().use { load(it, jksPass.toCharArray()) }
     }
     connector {
         port = 8080
@@ -29,15 +33,16 @@ private fun ApplicationEngine.Configuration.envConfig() {
     }
     sslConnector(
         keyStore = keyStore,
-        keyAlias = "X",
-        keyStorePassword = { "X".toCharArray() },
-        privateKeyPassword = { "X".toCharArray() }) {
+        keyAlias = keyAlias,
+        keyStorePassword = { jksPass.toCharArray() },
+        privateKeyPassword = { jksPass.toCharArray() }) {
         port = 8443
     }
+
+
 }
-
-
 fun main() {
+    println("TEST")
     embeddedServer(Netty, applicationEnvironment { log = LoggerFactory.getLogger("ktor.application") }, {envConfig()}) {
         install(WebSockets) {
             pingPeriod = 30.seconds
@@ -49,7 +54,6 @@ fun main() {
             header<UserSession>("user_session")
         }
         routing {
-
             // Thread-safe set for all connected sessions
             val sessions = Collections.synchronizedSet(mutableSetOf<DefaultWebSocketServerSession>())
             // Launch a coroutine for periodic broadcasting
