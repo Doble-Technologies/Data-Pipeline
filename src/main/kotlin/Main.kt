@@ -29,8 +29,13 @@ private fun ApplicationEngine.Configuration.envConfig() {
     val jksPass: String = System.getenv("jksPass") ?: ""
 
     val keyStore = KeyStore.getInstance("JKS").apply {
-        File("src/main/resources/certs/keystore.jks").inputStream().use { load(it, jksPass.toCharArray()) }
+        val keystoreStream = object {}.javaClass.getResourceAsStream("/certs/keystore.jks")
+        requireNotNull(keystoreStream) { "Keystore not found in resources!" }
+        keystoreStream.use {
+            load(it, jksPass.toCharArray())
+        }
     }
+
     connector {
         host = "127.0.0.1"
         port = 9090

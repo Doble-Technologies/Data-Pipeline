@@ -12,7 +12,9 @@ import tech.parkhurst.modal.Unit
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.stream.Collectors
 import kotlin.random.Random
+import kotlin.system.exitProcess
 
 class GeneratorLogic {
 
@@ -34,22 +36,26 @@ class GeneratorLogic {
         stateBounds?.set("TEXAS", doubleArrayOf(25.837377, -106.645646, 36.500704, -93.508292))
         stateBounds?.set("CONNECTICUT", doubleArrayOf(40.98014,-73.72777,42.05059,-71.78172))
 
-        //Load statements
-        File("src/main/resources/statements.txt").forEachLine {
-            statements.add(it);
+        object {}.javaClass.getResourceAsStream("/statements.txt").bufferedReader().use {
+            statements.add(it.readText())
         }
-        File("src/main/resources/incidentnatures.txt").forEachLine {
-            natures.add(it);
+
+        object {}.javaClass.getResourceAsStream("/incidentnatures.txt").bufferedReader().use {
+            natures.add(it.readText());
         }
-        File("src/main/resources/incidentnotes.txt").forEachLine {
-            notes.add(it);
+        object {}.javaClass.getResourceAsStream("/incidentnotes.txt").bufferedReader().use {
+            notes.add(it.readText());
         }
-        File("src/main/resources/incidentdesc.txt").forEachLine {
-            incDescriptions.add(it);
+        object {}.javaClass.getResourceAsStream("/incidentdesc.txt").bufferedReader().use {
+            incDescriptions.add(it.readText());
         }
-        File("src/main/resources/weather.txt").forEachLine {
-            weather.add(it);
+        object {}.javaClass.getResourceAsStream("/weather.txt").bufferedReader().use {
+            weather.add(it.readText());
         }
+        if(statements.isEmpty() || natures.isEmpty() || notes.isEmpty() || incDescriptions.isEmpty() || weather.isEmpty()){
+            exitProcess(32)
+        }
+
     }
 
     private fun generateDepartment(): String{
