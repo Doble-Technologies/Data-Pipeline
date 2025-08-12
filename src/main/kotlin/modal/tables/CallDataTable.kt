@@ -11,9 +11,14 @@ fun String.toCall(): Call = Json.decodeFromString(this)
 
 fun Call.toStrings(): String = Json.encodeToString(this)
 
+fun List<Int>.toJson(): String = Json.encodeToString(this)
+
+fun String.toIntList(): List<Int> = Json.decodeFromString(this)
+
 object CallDataTable : Table("call_data") {
     var id = integer("id")
     val data = jsonb("data", Call::toStrings, String::toCall )
     val status =varchar("call_status",255)
+    val departments = jsonb("departments", List<Int>::toJson, String::toIntList )
     override val primaryKey = PrimaryKey(id, name = "id")
 }
