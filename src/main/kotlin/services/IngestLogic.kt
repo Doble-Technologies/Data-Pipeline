@@ -1,7 +1,6 @@
 package tech.parkhurst.services
 
 import kotlinx.serialization.json.Json
-import org.jetbrains.exposed.v1.core.QueryBuilder
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.jdbc.andWhere
 import org.jetbrains.exposed.v1.jdbc.insert
@@ -64,7 +63,7 @@ fun getRecentCalls(numOfCalls: Int) : String {
     }
 }
 
-fun getCallsByDepartmentWithStatus(numOfCalls: Int, departments: List<Int> = emptyList(), status: String) : String {
+fun getCallsParams(numOfCalls: Int, departments: List<Int> = emptyList(), status: String) : String {
     try {
         val callData:ArrayList<Call> = ArrayList<Call>()
         transaction {

@@ -6,7 +6,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
 import tech.parkhurst.modal.Call
-import tech.parkhurst.modal.queries.GetCallsByDepartmentWithStatus
+import tech.parkhurst.modal.GetCallsParams
 import tech.parkhurst.modal.tables.toStrings
 import tech.parkhurst.services.*
 
@@ -71,9 +71,9 @@ fun Route.ingestRoutes(){
         }
     }
 
-    post("/getCallsByDepartmentWithStatus"){
+    post("/getCallsParams"){
         val parameters = call.receive<ByteArray>()
-        val decoded = Json.decodeFromString<GetCallsByDepartmentWithStatus>(parameters.decodeToString())
-        call.respond(getCallsByDepartmentWithStatus(decoded.numCalls, decoded.departments, decoded.status))
+        val decoded = Json.decodeFromString<GetCallsParams>(parameters.decodeToString())
+        call.respond(getCallsParams(decoded.numCalls, decoded.departments, decoded.status))
     }
 }
