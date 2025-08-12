@@ -1,11 +1,12 @@
 package tech.parkhurst.routes
 
-import io.ktor.client.request.invoke
 import io.ktor.http.*
 import io.ktor.server.request.receive
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.json.Json
 import tech.parkhurst.modal.Call
+import tech.parkhurst.modal.queries.GetCallsByDepartmentWithStatus
 import tech.parkhurst.modal.tables.toStrings
 import tech.parkhurst.services.*
 
@@ -68,5 +69,11 @@ fun Route.ingestRoutes(){
         }else{
             call.response.status(HttpStatusCode.BadRequest)
         }
+    }
+
+    post("/getCallsByDepartmentWithStatus"){
+        val parameters = call.receive<ByteArray>()
+        val decoded = Json.decodeFromString<GetCallsByDepartmentWithStatus>(parameters.decodeToString())
+        call.respond(getCallsByDepartmentWithStatus(decoded.numCalls, decoded.departments, decoded.status))
     }
 }

@@ -1,13 +1,16 @@
 package tech.parkhurst.services
 
 import kotlinx.serialization.json.Json
+import org.jetbrains.exposed.v1.core.QueryBuilder
 import org.jetbrains.exposed.v1.core.SortOrder
+import org.jetbrains.exposed.v1.jdbc.andWhere
 import org.jetbrains.exposed.v1.jdbc.insert
 import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import tech.parkhurst.modal.Call
 import tech.parkhurst.modal.tables.CallDataTable
 import tech.parkhurst.modal.tables.toStrings
+import tech.parkhurst.services.helpers.jsonbArrayOverlap
 
 
 fun getCall(searchId: Int) : String {
@@ -53,6 +56,32 @@ fun getRecentCalls(numOfCalls: Int) : String {
                 .forEach{
                     callData.add(it[CallDataTable.data])
                 }
+        }
+        return Json.encodeToString(callData)
+    }catch(e: Exception){
+        println("Error finding call: $e")
+        return "[]"
+    }
+}
+
+fun getCallsByDepartmentWithStatus(numOfCalls: Int, departments: List<Int> = emptyList(), status: String) : String {
+    try {
+        val callData:ArrayList<Call> = ArrayList<Call>()
+        transaction {
+            val query = CallDataTable.select(CallDataTable.id, CallDataTable.data)
+                .apply {
+                    if (status != "all") {
+                        andWhere { CallDataTable.status eq status }
+                    }
+                    if (departments.isNotEmpty()) {
+                        andWhere { jsonbArrayOverlap(CallDataTable.departments.name, departments) }
+                    }
+                }
+                .orderBy(CallDataTable.id to SortOrder.DESC)
+                .limit(numOfCalls)
+            query.forEach {
+                callData.add(it[CallDataTable.data])
+            }
         }
         return Json.encodeToString(callData)
     }catch(e: Exception){
