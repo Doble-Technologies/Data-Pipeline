@@ -69,6 +69,11 @@ fun insertCallData(callData: Call): Int {
     val generatedId = 0
     val callStatus = callData.incident.status
     val callId:Long = callData.callId
+    val callDepartments: List<Int> = buildSet {
+        add(callData.incident.serviceID)
+        addAll(callData.response.units.map { it.departmentId })
+        add(callData.response.serviceID)
+    }.toList()
     return try {
         transaction {
             // Execute a simple query to check the connection
@@ -76,6 +81,7 @@ fun insertCallData(callData: Call): Int {
                 it[id]=callId.toInt()
                 it[data]= callData
                 it[status] = callStatus
+                it[departments] = callDepartments
             }
             test.insertedCount
         }
