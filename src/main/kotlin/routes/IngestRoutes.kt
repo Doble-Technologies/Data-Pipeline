@@ -79,7 +79,21 @@ fun Route.ingestRoutes(){
 
     post("/ingest"){
         val parameters = call.receive<ByteArray>()
-        val decoded = Json.decodeFromString<Call>(parameters.decodeToString())
-        call.respond(decoded.toString())
+        //Todo: Rewrite this to be a singular try catch with more accurate error messages
+        var decoded: Call?= null
+        try{
+            decoded = Json.decodeFromString<Call>(parameters.decodeToString())
+        }catch(e: Exception){
+            //invalid json
+        }
+        try{
+            if(decoded != null){
+                insertCallData(decoded)
+                call.respond(decoded.toString())
+            }
+        }catch(e: Exception){
+            //db insert error
+        }
+
     }
 }
