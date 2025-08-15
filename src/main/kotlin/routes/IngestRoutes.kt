@@ -6,11 +6,12 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
 import tech.parkhurst.modal.Call
+import tech.parkhurst.modal.CreateUserParams
 import tech.parkhurst.modal.GetCallsParams
 import tech.parkhurst.modal.tables.toStrings
 import tech.parkhurst.services.*
 
-val gen= GeneratorLogic()
+val gen = GeneratorLogic()
 
 
 
@@ -75,5 +76,26 @@ fun Route.ingestRoutes(){
         val parameters = call.receive<ByteArray>()
         val decoded = Json.decodeFromString<GetCallsParams>(parameters.decodeToString())
         call.respond(getCallsParams(decoded.numCalls, decoded.departments, decoded.status))
+    }
+
+    post("/createUser"){
+        try {
+            val parameters = call.receive<ByteArray>()
+            val decoded = Json.decodeFromString<CreateUserParams>(parameters.decodeToString())
+            call.respond(createUser(
+                decoded.firstName,
+                decoded.lastName,
+                decoded.number,
+                decoded.email,
+                decoded.provider,
+                decoded.departments,
+                decoded.globalRole,
+                decoded.primaryDept,
+                decoded.token,
+                decoded.firebaseUid,
+            ).toString())
+        } catch (e: Exception) {
+            println(e)
+        }
     }
 }

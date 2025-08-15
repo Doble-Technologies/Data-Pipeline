@@ -8,6 +8,7 @@ import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
 import tech.parkhurst.modal.Call
 import tech.parkhurst.modal.tables.CallDataTable
+import tech.parkhurst.modal.tables.UserDataTable
 import tech.parkhurst.modal.tables.toStrings
 import tech.parkhurst.services.helpers.jsonbArrayOverlap
 
@@ -87,6 +88,32 @@ fun getCallsParams(numOfCalls: Int, departments: List<Int> = emptyList(), status
         println("Error finding call: $e")
         return "[]"
     }
+}
+
+fun createUser(
+    firstName: String,
+    lastName: String,
+    number: String,
+    email: String,
+    provider: String,
+    departments: List<Int>,
+    globalRole: String,
+    primaryDept: Int?,
+    token: String?,
+    firebaseUid: String?
+): Int = transaction {
+    UserDataTable.insert { row ->
+        row[UserDataTable.firstName] = firstName
+        row[UserDataTable.lastName] = lastName
+        row[UserDataTable.number] = number
+        row[UserDataTable.email] = email
+        row[UserDataTable.provider] = provider
+        row[UserDataTable.departments] = departments
+        row[UserDataTable.globalRole] = globalRole
+        row[UserDataTable.primaryDept] = primaryDept
+        row[UserDataTable.token] = token
+        row[UserDataTable.firebaseUid] = firebaseUid
+    } get UserDataTable.id
 }
 
 /**
