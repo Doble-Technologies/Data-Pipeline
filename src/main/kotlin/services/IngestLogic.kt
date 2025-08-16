@@ -4,8 +4,10 @@ import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.v1.core.SortOrder
 import org.jetbrains.exposed.v1.jdbc.andWhere
 import org.jetbrains.exposed.v1.jdbc.insert
+import org.jetbrains.exposed.v1.jdbc.insertIgnore
 import org.jetbrains.exposed.v1.jdbc.select
 import org.jetbrains.exposed.v1.jdbc.transactions.transaction
+import org.jetbrains.exposed.v1.jdbc.upsertReturning
 import tech.parkhurst.modal.Call
 import tech.parkhurst.modal.tables.CallDataTable
 import tech.parkhurst.modal.tables.toStrings
@@ -93,7 +95,7 @@ fun getCallsParams(numOfCalls: Int, departments: List<Int> = emptyList(), status
  * @param callData A Response call usually auto generated
  * @return 1 if success 0 if not
  */
-fun insertCallData(callData: Call): Int {
+fun insertCallData(callData: Call): Int? {
     val generatedId = 0
     val callStatus = callData.incident.status
     val callId:Long = callData.callId
@@ -105,21 +107,15 @@ fun insertCallData(callData: Call): Int {
     return try {
         transaction {
             // Execute a simple query to check the connection
-            val test=CallDataTable.insert {
+            val test=CallDataTable.upsertReturning() {
                 it[id]=callId.toInt()
                 it[data]= callData
                 it[status] = callStatus
                 it[departments] = callDepartments
-            }
-            test.insertedCount
+            }.singleOrNull()
+            test?.get(CallDataTable.id)
         }
     } catch (e: Exception) {
-        //Update table
-
-
-        //or push  old row to audit table
-        //then insert
-
         println("Error Insert: $e")
         generatedId
     }

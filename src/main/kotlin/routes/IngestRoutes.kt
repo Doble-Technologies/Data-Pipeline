@@ -84,7 +84,7 @@ fun Route.ingestRoutes(){
         try{
             decoded = Json.decodeFromString<Call>(parameters.decodeToString())
         }catch(e: Exception){
-            //invalid json
+            println("ERROR PARSING: $e")
         }
         try{
             if(decoded != null){
@@ -92,7 +92,7 @@ fun Route.ingestRoutes(){
                 call.respond(decoded.toString())
             }
         }catch(e: Exception){
-            //db insert error
+            println("Database Insert Error: $e")
         }
 
     }
