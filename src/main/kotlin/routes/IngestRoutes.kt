@@ -1,18 +1,22 @@
 package tech.parkhurst.routes
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
 import io.ktor.server.request.receive
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import tech.parkhurst.modal.Call
 import tech.parkhurst.modal.CreateUserParams
 import tech.parkhurst.modal.GetCallsParams
 import tech.parkhurst.modal.tables.toStrings
 import tech.parkhurst.services.*
+import java.sql.SQLException
 
 val gen = GeneratorLogic()
 
+private val logger = KotlinLogging.logger {}
 
 
 //Todo define error objects for better error handling messaging
@@ -35,7 +39,7 @@ fun Route.ingestRoutes(){
     }
 
     get("/testendpoint"){
-        call.respondText("{'version': 1.0.2}")
+        call.respondText("{'version': 1.0.6}")
     }
 
 
@@ -78,24 +82,65 @@ fun Route.ingestRoutes(){
         call.respond(getCallsParams(decoded.numCalls, decoded.departments, decoded.status))
     }
 
-    post("/createUser"){
+    post("/createUser") {
         try {
             val parameters = call.receive<ByteArray>()
             val decoded = Json.decodeFromString<CreateUserParams>(parameters.decodeToString())
-            call.respond(createUser(
-                decoded.firstName,
-                decoded.lastName,
-                decoded.number,
-                decoded.email,
-                decoded.provider,
-                decoded.departments,
-                decoded.globalRole,
-                decoded.primaryDept,
-                decoded.token,
-                decoded.firebaseUid,
-            ).toString())
+            call.respond(
+                createUser(
+                    decoded.firstName,
+                    decoded.lastName,
+                    decoded.number,
+                    decoded.email,
+                    decoded.provider,
+                    decoded.departments,
+                    decoded.globalRole,
+                    decoded.primaryDept,
+                    decoded.token,
+                    decoded.firebaseUid,
+                ).toString()
+            )
         } catch (e: Exception) {
             println(e)
+        }
+    }
+
+    post("/ingest"){
+        val parameters = call.receive<ByteArray>()
+        //Todo: Rewrite this to be a singular try catch with more accurate error messages
+        var decoded: Call?= null
+        try{
+            decoded = Json.decodeFromString<Call>(parameters.decodeToString())
+        }catch(e: SerializationException){
+            logger.error { "Error parsing input data: $e" }
+            call.respond(
+                    HttpStatusCode(470, "Invalid Call Data"),
+            mapOf(
+                "error" to "Failed to parse request body into Call object",
+                "details" to (e.message ?: "Unknown serialization error")
+            )
+            )
+
+        } catch (e: SQLException) {
+            // Database error → return 471
+            call.respond(
+                HttpStatusCode(471, "Database Insert Error"),
+                mapOf(
+                    "error" to "Failed to insert call data into database",
+                    "details" to (e.message ?: "Unknown SQL error")
+                )
+            )
+            logger.error { "Database/SQL Error $e" }
+        } catch (e: Exception) {
+            // Fallback → 500
+            call.respond(
+                HttpStatusCode.InternalServerError,
+                mapOf(
+                    "error" to "Unexpected server error",
+                    "details" to (e.message ?: "No details available")
+                )
+            )
+            logger.error {"Generic Unknown Error: $e"}
         }
     }
 }
