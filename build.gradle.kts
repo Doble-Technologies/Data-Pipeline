@@ -56,6 +56,7 @@ dependencies {
     implementation("io.github.oshai:kotlin-logging-jvm:5.0.2")
     implementation("org.slf4j:slf4j-api:1.7.25")
     implementation("ch.qos.logback:logback-classic:1.5.18")
+    implementation("com.github.loki4j:loki-logback-appender:1.5.1")
 
     //DB
     implementation("org.jetbrains.exposed:exposed-core:1.0.0-beta-2")

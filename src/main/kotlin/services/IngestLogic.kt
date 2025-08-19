@@ -111,13 +111,30 @@ fun insertCallData(callData: Call): Int? {
     return try {
         transaction {
             // Execute a simple query to check the connection
-            val test=CallDataTable.upsertReturning() {
-                it[id]=callId.toInt()
-                it[data]= callData
-                it[status] = callStatus
-                it[departments] = callDepartments
-            }.singleOrNull()
-            test?.get(CallDataTable.id)
+            val result = CallDataTable
+                .upsertReturning(
+                    keys = arrayOf(CallDataTable.id), // conflict target = PRIMARY KEY
+                    returning = listOf(
+                        CallDataTable.id,
+                        CallDataTable.data,
+                        CallDataTable.status,
+                        CallDataTable.departments,
+                        CallDataTable.xmax // only returned
+                    )
+                ) {
+                    it[id] = callId.toInt()
+                    it[data] = callData
+                    it[status] = callStatus
+                    it[departments] = callDepartments
+                }
+                .singleOrNull()
+            if (result != null) {
+                val rowId = result[CallDataTable.id]
+                val xmax = result[CallDataTable.xmax]
+                val wasInsert = (xmax == 0L)
+                println("Row $rowId was ${if (wasInsert) "inserted" else "updated"}")
+            }
+            3
         }
     } catch (e: Exception) {
         logger.error { "Error on DB Insert: $e" }

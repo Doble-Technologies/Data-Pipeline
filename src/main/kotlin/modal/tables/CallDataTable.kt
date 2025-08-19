@@ -1,6 +1,7 @@
 package tech.parkhurst.modal.tables
 
 import kotlinx.serialization.json.Json
+import org.jetbrains.exposed.v1.core.LongColumnType
 import org.jetbrains.exposed.v1.core.Table
 import org.jetbrains.exposed.v1.json.jsonb
 import tech.parkhurst.modal.Call
@@ -21,4 +22,7 @@ object CallDataTable : Table("call_data") {
     val status =varchar("call_status",255)
     val departments = jsonb("departments", List<Int>::toJson, String::toIntList )
     override val primaryKey = PrimaryKey(id, name = "id")
+
+    val xmax =registerColumn<Long>("xmax", LongColumnType())
+
 }

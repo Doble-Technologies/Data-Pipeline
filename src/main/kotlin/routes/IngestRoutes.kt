@@ -88,6 +88,8 @@ fun Route.ingestRoutes(){
         try{
             decoded = Json.decodeFromString<Call>(parameters.decodeToString())
             val id=insertCallData(decoded)
+            //if it was an insert send notification, if update do nothing
+
             call.respond("{'Success': $id}")
         }catch(e: SerializationException){
             logger.error { "Error parsing input data: $e" }
