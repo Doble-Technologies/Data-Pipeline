@@ -87,6 +87,8 @@ fun Route.ingestRoutes(){
         var decoded: Call?= null
         try{
             decoded = Json.decodeFromString<Call>(parameters.decodeToString())
+            val id=insertCallData(decoded)
+            call.respond("{'Success': $id}")
         }catch(e: SerializationException){
             logger.error { "Error parsing input data: $e" }
             call.respond(
@@ -118,7 +120,6 @@ fun Route.ingestRoutes(){
             )
             logger.error {"Generic Unknown Error: $e"}
         }
-
 
     }
 }
