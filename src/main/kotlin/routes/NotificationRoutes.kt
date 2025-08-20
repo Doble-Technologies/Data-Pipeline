@@ -18,7 +18,7 @@ import java.io.FileNotFoundException
 import kotlin.text.decodeToString
 
 fun getAccessToken(): String {
-    val configPath = System.getenv("TONES_CONFIG_PATH") ?: "src/main/kotlin/config/tones-config.json"
+    val configPath = System.getenv("TONES_CONFIG_PATH") ?: "src/main/resources/tones-config.json"
     val resourceStream = Thread.currentThread().contextClassLoader.getResourceAsStream("tones-config.json")
     val serviceAccountStream = resourceStream ?: try { FileInputStream(configPath) } catch (e: FileNotFoundException) { null }
     if (serviceAccountStream == null) {
