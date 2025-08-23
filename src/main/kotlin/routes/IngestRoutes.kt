@@ -39,7 +39,7 @@ fun Route.ingestRoutes(){
     }
 
     get("/testendpoint"){
-        call.respondText("{'version': 1.0.6}")
+        call.respondText("{'version': 1.0.7}")
     }
 
 
@@ -119,6 +119,11 @@ fun Route.ingestRoutes(){
         var decoded: Call?= null
         try{
             decoded = Json.decodeFromString<Call>(parameters.decodeToString())
+            val transactionType=insertCallData(decoded)
+            //if it was an insert send notification, if update do nothing
+            
+
+            call.respond("{'Success': $transactionType}")
         }catch(e: SerializationException){
             logger.error { "Error parsing input data: $e" }
             call.respond(
