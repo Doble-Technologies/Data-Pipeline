@@ -85,7 +85,7 @@ fun getCallsParams(callParams: GetCallsParams) : String {
                         andWhere { jsonbArrayOverlap(CallDataTable.departments.name, departments) }
                     }
                 }
-                .orderBy(CallDataTable.id to SortOrder.DESC)
+                .orderBy(CallDataTable.createdAt to SortOrder.DESC)
                 .limit(numOfCalls)
             query.forEach {
                 callData.add(it[CallDataTable.data])

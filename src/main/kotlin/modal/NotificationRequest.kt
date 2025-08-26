@@ -12,19 +12,19 @@ data class NotificationRequest(
 
 @Serializable
 data class FcmNotification(
-    val title: String,
-    val body: String,
-    val sound: String = "default"
+    var title: String,
+    var body: String,
+    var sound: String = "default"
 )
 
 @Serializable
 data class FcmMessage(
-    val topic: String? = null,
-    val notification: FcmNotification,
-    val data: Map<String, String> = emptyMap()
+    var topic: String? = null,
+    var notification: FcmNotification,
+    var data: Map<String, String> = emptyMap()
 )
 
 @Serializable
 data class FcmRequest(
-    val message: FcmMessage
+    var message: FcmMessage
 )

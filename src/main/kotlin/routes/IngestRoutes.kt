@@ -7,6 +7,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
+import tech.parkhurst.GlobalStore
 import tech.parkhurst.modal.Call
 import tech.parkhurst.modal.CreateUserParams
 import tech.parkhurst.modal.GetCallsParams
@@ -19,9 +20,9 @@ val gen = GeneratorLogic()
 private val logger = KotlinLogging.logger {}
 
 
-//Todo define error objects for better error handling messaging
 fun Route.ingestRoutes(){
     get("/generateCall"){
+        //Todo: Rewrite to a single try catch with better error catching
         var generatedCall: Call?= null
         try{
             generatedCall = gen.generateCall()
@@ -31,6 +32,7 @@ fun Route.ingestRoutes(){
         try{
             if (generatedCall != null) {
                 insertCallData(generatedCall)
+                GlobalStore.pendingCalls.add(generatedCall)
                 call.respondText(generatedCall.toStrings())
             }
         }catch (e: Exception){
@@ -39,7 +41,7 @@ fun Route.ingestRoutes(){
     }
 
     get("/testendpoint"){
-        call.respondText("{'version': 1.0.7}")
+        call.respondText("{'version': 1.0.8}")
     }
 
 
@@ -115,14 +117,12 @@ fun Route.ingestRoutes(){
 
     post("/ingest"){
         val parameters = call.receive<ByteArray>()
-        //Todo: Rewrite this to be a singular try catch with more accurate error messages
         var decoded: Call?= null
         try{
             decoded = Json.decodeFromString<Call>(parameters.decodeToString())
             val transactionType=insertCallData(decoded)
             //if it was an insert send notification, if update do nothing
-            
-
+            //async send notification
             call.respond("{'Success': $transactionType}")
         }catch(e: SerializationException){
             logger.error { "Error parsing input data: $e" }

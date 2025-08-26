@@ -9,6 +9,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import tech.parkhurst.modal.NotificationRequest
 import com.google.auth.oauth2.GoogleCredentials
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.serialization.json.Json
 import tech.parkhurst.modal.FcmMessage
 import tech.parkhurst.modal.FcmNotification
@@ -16,6 +17,10 @@ import tech.parkhurst.modal.FcmRequest
 import java.io.FileInputStream
 import java.io.FileNotFoundException
 import kotlin.text.decodeToString
+
+private val logger = KotlinLogging.logger {}
+
+
 
 fun getAccessToken(): String {
     val configPath = System.getenv("TONES_CONFIG_PATH") ?: "src/main/resources/tones-config.json"
@@ -32,19 +37,20 @@ fun getAccessToken(): String {
 }
 
 fun Route.notificationRoutes(client: HttpClient) {
-    post("/sendNotification") {
+    post("/sendnotification") {
+        //TODO: Error handling if no body is passed
+        logger.info { "Registered" }
         val encoded = call.receive<ByteArray>()
         val payload = Json.decodeFromString<NotificationRequest>(encoded.decodeToString())
-        println(payload)
+        logger.info {payload.toString()}
         val accessToken = try {
             getAccessToken()
         } catch (e: Exception) {
             call.respond(HttpStatusCode.InternalServerError, mapOf("error" to "Failed to load service account: ${e.message}"))
             return@post
         }
-        println(accessToken)
-
-        println("Passed")
+        logger.info { accessToken}
+        logger.info {"PASSED"}
 
         if (payload.topics.isNotEmpty()) {
             val results = mutableListOf<Map<String, String>>()
@@ -61,18 +67,25 @@ fun Route.notificationRoutes(client: HttpClient) {
                     )
                 )
                 try {
-                    println(fcmRequest)
+
+                    logger.info {"Bearer $accessToken"}
+
+                    logger.info {"fcmRequest $fcmRequest.toString()"}
                     val response = client.post("https://fcm.googleapis.com/v1/projects/tones-9f1d4/messages:send") {
                         header("Authorization", "Bearer $accessToken")
                         contentType(ContentType.Application.Json)
                         setBody(fcmRequest)
                     }
+                    logger.info { "Might be crazy bout what imma say: ${response.toString()}" }
                     results.add(mapOf("topic" to topic, "status" to "sent", "fcmResponse" to response.bodyAsText()))
                 } catch (e: Exception) {
+                    logger.error { e.toString() }
+                    e.printStackTrace()
+                    logger.error { e.message }
                     results.add(mapOf("topic" to topic, "error" to "Failed to send notification: ${e.message}"))
                 }
             }
-            println("Results")
+            logger.info {"Success"}
             call.respondText(results.toString(), contentType = ContentType.Text.Plain)
             return@post
         } else {
