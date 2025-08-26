@@ -122,6 +122,9 @@ fun Route.ingestRoutes(){
             decoded = Json.decodeFromString<Call>(parameters.decodeToString())
             val transactionType=insertCallData(decoded)
             //if it was an insert send notification, if update do nothing
+            if(transactionType=="Insert"){
+                GlobalStore.pendingCalls.add(decoded)
+            }
             //async send notification
             call.respond("{'Success': $transactionType}")
         }catch(e: SerializationException){
