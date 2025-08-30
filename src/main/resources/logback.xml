@@ -1,11 +1,12 @@
 <configuration>
+    <property name="ENVIRONMENT" value="dev"/>
     <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
         <http>
             <url>http://192.168.0.105:3100/loki/api/v1/push</url> <!-- your Loki endpoint -->
         </http>
         <format>
             <label>
-                <pattern>app=tones-pipeline,level=%level,service=tones-pipeline-${ENVIRONMENT},host=dev,requestId=${%X{X-Request-ID}}</pattern>
+                <pattern>app=tones-pipeline,level=%level,service=tones-pipeline-${ENVIRONMENT},host=${ENVIRONMENT},requestId=${%X{X-Request-ID}}</pattern>
             </label>
             <message>
                 <pattern>%level %logger{36} message: "%message" </pattern>
