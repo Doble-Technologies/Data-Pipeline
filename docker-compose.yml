@@ -5,11 +5,14 @@ services:
     container_name: doble-pipeline
     restart: unless-stopped
     environment:
-      - apiKey=${API_KEY}
-      - dbPass=${DB_PASS}
-      - dbUrl=${DB_URL}
-      - dbUser=${DB_USER}
+      - apiKey=${apiKey}
+      - dbPass=${dbPass}
+      - dbUrl=${dbUrl}
+      - dbUser=${dbUser}
+      - googleApiKey=${googleApiKey}
+      - keyAlias=${keyAlias}
+      - jksPass=${jksPass}
     ports:
-      - "9090:9090"   # change if your app listens on a different port
+      - "8443:8443"   # change if your app listens on a different port
     volumes:
       - ./mnt/user/applications/pipeline:/data
